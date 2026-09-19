@@ -1,0 +1,49 @@
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-ast
+      - id: fix-byte-order-marker
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: check-executables-have-shebangs
+      - id: check-json
+      - id: check-toml
+      - id: check-yaml
+      - id: debug-statements
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: mixed-line-ending
+      - id: check-added-large-files
+        args: [--maxkb=1024]
+-   repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.5
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+-   repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v2.3.0
+    hooks:
+      - id: mypy
+        args: [--ignore-missing-imports]
+-   repo: https://github.com/compilerla/conventional-pre-commit
+    rev: 'v4.4.0'
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+-   repo: https://github.com/econchick/interrogate
+    rev: 1.7.0
+    hooks:
+      - id: interrogate
+        args: [-vv, --fail-under=80, --config=pyproject.toml]
+        exclude: ^tests/
+-   repo: local
+    hooks:
+      - id: pytest coverage
+        name: Check pytest coverage
+        entry: uv run pytest --cov=claude_kiosk
+        pass_filenames: false
+        language: system
+        types: [python]

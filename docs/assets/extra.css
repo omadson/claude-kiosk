@@ -1,0 +1,41 @@
+/* Match claude_kiosk/static/style.css: dark background + Claude orange accent. */
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #d97757;
+  --md-primary-fg-color--light: #e2937a;
+  --md-primary-fg-color--dark: #b85f3f;
+  --md-primary-bg-color: #ffffff;
+  --md-primary-bg-color--light: #ffffff;
+
+  --md-accent-fg-color: #d97757;
+  --md-accent-fg-color--transparent: #d977571a;
+  --md-accent-bg-color: #ffffff;
+  --md-accent-bg-color--light: #ffffff;
+
+  --md-default-bg-color: #1a1a1a;
+  --md-default-bg-color--light: #262626;
+  --md-default-bg-color--lighter: #333333;
+  --md-default-bg-color--lightest: #3a3a3a;
+
+  --md-default-fg-color: #ffffff;
+  --md-default-fg-color--light: #999999;
+  --md-default-fg-color--lighter: #999999;
+  --md-default-fg-color--lightest: #3a3a3a;
+
+  --md-code-bg-color: #262626;
+  --md-code-fg-color: #e6e6e6;
+
+  --md-typeset-a-color: #d97757;
+}
+
+.md-header {
+  background-color: #1a1a1a;
+}
+
+.md-content img {
+  /* Match .md-typeset .admonition's border-radius (.2rem) exactly. */
+  border-radius: 0.2rem;
+}
+
+.md-content img[src*="screenshots/"] {
+  border: 1px solid rgba(255, 255, 255, 0.30);
+}

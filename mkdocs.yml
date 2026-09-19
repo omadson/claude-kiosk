@@ -1,0 +1,35 @@
+site_name: claude-kiosk
+repo_url: https://github.com/omadson/claude-kiosk
+
+theme:
+  name: material
+  logo: assets/logo.png
+  favicon: assets/logo.png
+  palette:
+    scheme: slate
+    primary: custom
+    accent: custom
+  features:
+    - content.code.copy
+    - content.tabs.link
+    - navigation.footer
+
+plugins:
+  - search
+  - mkdocstrings
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+
+extra_css:
+  - assets/extra.css
+
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Usage: usage.md
+  - Changelog: CHANGELOG.md

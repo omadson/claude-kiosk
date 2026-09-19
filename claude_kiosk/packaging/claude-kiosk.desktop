@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Claude Kiosk
+Exec=__EXE__ open
+Icon=claude-kiosk
+StartupWMClass=Claude-kiosk
+Terminal=false
+Categories=Utility;

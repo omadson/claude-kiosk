@@ -1,0 +1,12 @@
+# Changes here will be overwritten by `copier update` — do not edit by hand.
+_commit: v0.1.1
+_src_path: gh:omadson/python-template
+author_email: madsonddias@gmail.com
+author_name: Madson Dias
+description: Local kiosk display for Claude usage and system resource stats.
+github_user: omadson
+license: MIT
+package_module: claude_kiosk
+package_name: claude-kiosk
+project_type: cli
+python_version: '3.14'

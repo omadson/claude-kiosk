@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Claude Usage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" type="image/png" href="favicon.png">
+</head>
+<body onclick="handleClick(event)">
+  <div class="top" id="top" data-screen="screen-usage">
+    <svg class="top-icon avatar" viewBox="0 0 24 24">
+      <path clip-rule="evenodd" fill-rule="evenodd" fill="#D97757"
+        d="M20.998 10.949H24v3.102h-3v3.028h-1.487V20H18v-2.921h-1.487V20H15v-2.921H9V20H7.488v-2.921H6V20H4.487v-2.921H3V14.05H0V10.95h3V5h17.998v5.949zM6 10.949h1.488V8.102H6v2.847zm10.51 0H18V8.102h-1.49v2.847z"/>
+    </svg>
+    <!-- official Fedora icon (2021 mark), https://upload.wikimedia.org/wikipedia/commons/4/41/Fedora_icon_(2021).svg -->
+    <svg class="top-icon icon-overview" viewBox="0 0 135.467 135.467">
+      <g transform="matrix(2.47028 0 0 2.46995 .000261612 2.46995e-6)">
+        <path transform="translate(153.458 83.8729)" fill="#51a2da" d="m-126.036-83.8729c-15.1394 0-27.4072 12.2693-27.4171 27.4053h-5e-3v21.2225h5e-3c7e-3 3.43625 2.79209 6.21827 6.23008 6.21827h21.198c15.1413-0.0097 27.4055-12.2773 27.4055-27.4171 2.1e-5 -15.1463-12.2708-27.429-27.4171-27.429z"/>
+        <g transform="matrix(1.41106 0 0 1.44183 -.0067016 -.043779)">
+          <path fill="#fff" d="m23.3724 7.83534c-3.02899 0-5.70466 2.23659-6.07508 5.17074-0.0249 0.245618-0.03219 0.422251-0.03359 0.644922l0.0036 11.9967c0 2.30124-1.75621 3.86746-3.95066 3.86746-2.19748 0-3.96772-1.72215-3.96772-3.87108 0.03604-2.35909 1.96132-3.85552 4.20698-3.92069h0.01188l2.27996-0.02066v-3.16725l-2.27996 0.01654c-4.08733-0.03604-7.33169 3.10302-7.45019 7.09362 0 3.88059 3.25103 7.04453 7.19801 7.04453 3.72317 0 6.8214-2.85281 7.15977-6.42235 0.04877-1.21501 0.02532-2.81843 0.02532-2.81843 0.0068-0.66023-0.0105-0.42328-0.0036-1.73426l2.82773-0.02016c2.18818 0.01519 2.16344-3.21792-0.02532-3.17345l-2.80293 0.02066c0-1.62735 0.02609-3.24483 0-4.87464 0.0019-1.40961 1.36289-2.65513 2.87321-2.65513 1.5107 0 3.10885 0.739495 3.10885 2.65513 0 0.27369-0.0057 0.43294-0.02119 0.534336-0.168616 0.888402 0.450459 1.73786 1.36219 1.86604 0.911733 0.126699 1.74882-0.519356 1.83917-1.418 0.05223-0.355248 0.05013-0.66852 0.05013-0.981853 0-3.37798-3.07825-5.82652-6.33863-5.82652z"/>
+        </g>
+      </g>
+    </svg>
+    <div class="weather" id="weather">
+      <div class="weather-row">
+        <div class="weather-row-group">
+          <svg class="weather-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+          </svg>
+          <span class="weekday" id="weekday"></span>
+        </div>
+        <div class="weather-row-group">
+          <svg class="weather-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>
+          </svg>
+          <span class="clock" id="clock">--:--</span>
+        </div>
+      </div>
+      <div class="weather-meta">
+        <div class="weather-meta-item">
+          <svg class="weather-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0z"/>
+          </svg>
+          <span class="weather-label" id="temp">--°</span>
+        </div>
+        <div class="weather-meta-item">
+          <svg class="weather-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2c-4 5-7 8.5-7 12a7 7 0 0 0 14 0c0-3.5-3-7-7-12z"/>
+          </svg>
+          <span class="weather-label" id="humidity">--%</span>
+        </div>
+        <div class="weather-meta-item">
+          <svg class="weather-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>
+          </svg>
+          <span class="city">Fortaleza</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="screens">
+    <div class="screen active" id="screen-usage">
+      <div class="meter">
+        <div class="row">
+          <div class="label">Current session</div>
+          <div class="pct" id="session-pct">--</div>
+        </div>
+        <div class="bar"><div class="fill" id="session-fill"></div></div>
+        <div class="reset"><span id="session-reset-left"></span><span id="session-reset-right"></span></div>
+      </div>
+      <div class="meter">
+        <div class="row">
+          <div class="label">Weekly session</div>
+          <div class="pct" id="week-pct">--</div>
+        </div>
+        <div class="bar"><div class="fill" id="week-fill"></div></div>
+        <div class="reset"><span id="week-reset-left"></span><span id="week-reset-right"></span></div>
+      </div>
+      <div class="err" id="err"></div>
+    </div>
+    <div class="screen" id="screen-overview">
+      <div class="meter-row">
+        <div class="meter">
+          <div class="row">
+            <!-- lucide "memory-stick" icon (ISC, https://lucide.dev) -->
+            <svg class="meter-icon" viewBox="0 0 24 24">
+              <path d="M12 12v-2"/><path d="M12 18v-2"/><path d="M16 12v-2"/><path d="M16 18v-2"/>
+              <path d="M2 11h1.5"/><path d="M20 18v-2"/><path d="M20.5 11H22"/><path d="M4 18v-2"/>
+              <path d="M8 12v-2"/><path d="M8 18v-2"/><rect x="2" y="6" width="20" height="10" rx="2"/>
+            </svg>
+            <div class="pct" id="ov-memory-pct">--</div>
+          </div>
+          <div class="bar"><div class="fill" id="ov-memory-fill"></div></div>
+          <div class="reset"><span id="ov-memory-used-total"></span><span id="ov-memory-free"></span></div>
+        </div>
+        <div class="meter">
+          <div class="row">
+            <!-- lucide "cpu" icon (ISC, https://lucide.dev) -->
+            <svg class="meter-icon" viewBox="0 0 24 24">
+              <path d="M12 20v2"/><path d="M12 2v2"/><path d="M17 20v2"/><path d="M17 2v2"/>
+              <path d="M2 12h2"/><path d="M2 17h2"/><path d="M2 7h2"/><path d="M20 12h2"/>
+              <path d="M20 17h2"/><path d="M20 7h2"/><path d="M7 20v2"/><path d="M7 2v2"/>
+              <rect x="4" y="4" width="16" height="16" rx="2"/><rect x="8" y="8" width="8" height="8" rx="1"/>
+            </svg>
+            <div class="pct" id="ov-cpu-pct">--</div>
+          </div>
+          <div class="bar"><div class="fill" id="ov-cpu-fill"></div></div>
+          <div class="reset"><span id="ov-cpu-used-total"></span><span id="ov-cpu-free"></span></div>
+        </div>
+      </div>
+      <div class="meter">
+        <div class="row">
+          <!-- lucide "hard-drive" icon (ISC, https://lucide.dev) -->
+          <svg class="meter-icon" viewBox="0 0 24 24">
+            <line x1="22" x2="2" y1="12" y2="12"/>
+            <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
+            <line x1="6" x2="6.01" y1="16" y2="16"/>
+            <line x1="10" x2="10.01" y1="16" y2="16"/>
+          </svg>
+          <div class="pct" id="ov-disk-pct">--</div>
+        </div>
+        <div class="bar"><div class="fill" id="ov-disk-fill"></div></div>
+        <div class="reset"><span id="ov-disk-used-total"></span><span id="ov-disk-free"></span></div>
+      </div>
+    </div>
+  </div>
+<script src="script.js"></script>
+</body>
+</html>
