@@ -5,11 +5,9 @@
 <h1 align="center">claude-kiosk</h1>
 
 <p align="center">
-  <a href="https://github.com/omadson/claude-kiosk/actions/workflows/ci.yml"><img src="https://github.com/omadson/claude-kiosk/actions/workflows/ci.yml/badge.svg" alt="Build"></a>
   <a href="https://omadson.github.io/claude-kiosk/"><img src="https://img.shields.io/badge/docs-online-blue" alt="Docs"></a>
-  <img src="https://img.shields.io/badge/coverage-%E2%89%A570%25-brightgreen" alt="Coverage">
   <a href="https://pypi.org/project/claude-kiosk/"><img src="https://img.shields.io/pypi/v/claude-kiosk" alt="PyPI version"></a>
-  <a href="https://pypi.org/project/claude-kiosk/"><img src="https://img.shields.io/pypi/dm/claude-kiosk" alt="Downloads"></a>
+  <a href="https://pepy.tech/project/claude-kiosk"><img src="https://pepy.tech/badge/claude-kiosk" alt="Downloads"></a>
   <a href="https://github.com/omadson/claude-kiosk/blob/main/LICENSE"><img src="https://img.shields.io/github/license/omadson/claude-kiosk" alt="License"></a>
 </p>
 
