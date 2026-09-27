@@ -26,9 +26,10 @@ CREDS_PATH = Path("~/.claude/.credentials.json").expanduser()
 USAGE_URL = "https://api.anthropic.com/api/oauth/usage"
 
 # Passaré, Fortaleza-CE; overridable via `claude-kiosk config`
-DEFAULT_CONFIG = {
+DEFAULT_CONFIG: dict[str, float | int | str] = {
     "weather_lat": -3.8131,
     "weather_lon": -38.5321,
+    "weather_city": "Fortaleza",
     "port": 8420,
     "min_fetch_interval": 300,  # seconds; avoid tripping the usage API's 429s
     "weather_min_interval": 900,  # seconds; weather doesn't need to be fresher
@@ -114,6 +115,28 @@ def fetch_usage():
                 "data"
             ]  # serve stale data instead of breaking the page (e.g. on 429)
         raise
+
+
+def geocode_city(lat, lon):
+    """Reverse-geocode lat/lon to a short place name (no API key needed)."""
+    try:
+        url = (
+            "https://api.bigdatacloud.net/data/reverse-geocode-client"
+            f"?latitude={lat}&longitude={lon}&localityLanguage=en"
+        )
+        req = urllib.request.Request(
+            url, headers={"User-Agent": "claude-kiosk"}
+        )
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            payload = json.load(resp)
+        return (
+            payload.get("city")
+            or payload.get("locality")
+            or payload.get("principalSubdivision")
+            or payload.get("countryName")
+        )
+    except Exception:
+        return None
 
 
 _weather_cache = {"data": None, "fetched_at": 0.0}
@@ -250,6 +273,7 @@ class Handler(BaseHTTPRequestHandler):
             except Exception as e:
                 data = {"error": str(e)}
             data["weather"] = fetch_weather()
+            data["city"] = _config.get("weather_city")
             data["disk"] = fetch_disk()
             data["memory"] = fetch_memory()
             data["cpu"] = fetch_cpu()

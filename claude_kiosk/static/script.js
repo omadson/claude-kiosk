@@ -51,6 +51,9 @@ async function refresh() {
       document.getElementById("temp").textContent = Math.round(data.weather.temp) + "°";
       document.getElementById("humidity").textContent = Math.round(data.weather.humidity) + "%";
     }
+    if (data.city) {
+      document.getElementById("city").textContent = data.city;
+    }
     const gb = b => (b / 1024 ** 3).toFixed(0);
     function setMeter(prefix, pct, hue, leftText, rightText) {
       const pctEl = document.getElementById(`${prefix}-pct`);
