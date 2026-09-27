@@ -62,6 +62,7 @@ def test_config_command_updates_and_persists(monkeypatch, tmp_path):
     monkeypatch.setattr(server, "CONFIG_DIR", tmp_path)
     monkeypatch.setattr(server, "CONFIG_PATH", tmp_path / "config.json")
     monkeypatch.setattr(server, "_config", dict(server.DEFAULT_CONFIG))
+    monkeypatch.setattr(server, "geocode_city", lambda lat, lon: "Testville")
 
     result = runner.invoke(
         app, ["config", "--lat", "10", "--lon", "20", "--port", "9000"]
@@ -69,10 +70,27 @@ def test_config_command_updates_and_persists(monkeypatch, tmp_path):
 
     assert result.exit_code == 0
     assert "port: 9000" in result.output
+    assert "weather_city: Testville" in result.output
     saved = json.loads((tmp_path / "config.json").read_text())
     assert saved["weather_lat"] == 10.0
     assert saved["weather_lon"] == 20.0
+    assert saved["weather_city"] == "Testville"
     assert saved["port"] == 9000
+
+
+def test_config_command_falls_back_to_coords_when_geocode_fails(
+    monkeypatch, tmp_path
+):
+    monkeypatch.setattr(server, "CONFIG_DIR", tmp_path)
+    monkeypatch.setattr(server, "CONFIG_PATH", tmp_path / "config.json")
+    monkeypatch.setattr(server, "_config", dict(server.DEFAULT_CONFIG))
+    monkeypatch.setattr(server, "geocode_city", lambda lat, lon: None)
+
+    result = runner.invoke(app, ["config", "--lat", "10", "--lon", "20"])
+
+    assert result.exit_code == 0
+    saved = json.loads((tmp_path / "config.json").read_text())
+    assert saved["weather_city"] == "10.00, 20.00"
 
 
 def test_config_command_rejects_out_of_range_lat(monkeypatch, tmp_path):

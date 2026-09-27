@@ -75,8 +75,12 @@ def config(
     server._load_config()
 
     if lat is not None or lon is not None:
-        new_lat = lat if lat is not None else server._config["weather_lat"]
-        new_lon = lon if lon is not None else server._config["weather_lon"]
+        new_lat = (
+            lat if lat is not None else float(server._config["weather_lat"])
+        )
+        new_lon = (
+            lon if lon is not None else float(server._config["weather_lon"])
+        )
         if not (-90 <= new_lat <= 90 and -180 <= new_lon <= 180):
             typer.echo(
                 "Error: --lat must be -90..90, --lon must be -180..180.",
@@ -85,6 +89,10 @@ def config(
             raise typer.Exit(1)
         server._config["weather_lat"] = new_lat
         server._config["weather_lon"] = new_lon
+        city = server.geocode_city(new_lat, new_lon)
+        server._config["weather_city"] = (
+            city or f"{new_lat:.2f}, {new_lon:.2f}"
+        )
     if port is not None:
         server._config["port"] = port
     if min_fetch_interval is not None:

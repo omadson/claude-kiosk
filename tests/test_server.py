@@ -95,3 +95,29 @@ def test_api_usage(running_server):
     with urllib.request.urlopen(f"{running_server}/api/usage") as resp:
         data = json.loads(resp.read())
     assert "disk" in data and "memory" in data and "cpu" in data
+    assert data["city"] == server.DEFAULT_CONFIG["weather_city"]
+
+
+def test_geocode_city_parses_response(monkeypatch):
+    class FakeResp:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def read(self):
+            return b'{"city": "Testville", "countryName": "Testland"}'
+
+    monkeypatch.setattr(
+        server.urllib.request, "urlopen", lambda *a, **k: FakeResp()
+    )
+    assert server.geocode_city(1.0, 2.0) == "Testville"
+
+
+def test_geocode_city_returns_none_on_failure(monkeypatch):
+    def boom(*a, **k):
+        raise OSError("network down")
+
+    monkeypatch.setattr(server.urllib.request, "urlopen", boom)
+    assert server.geocode_city(1.0, 2.0) is None
