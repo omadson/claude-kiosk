@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.2.1 (2026-10-01)
+
+### Bug Fixes
+
+- Zero expired usage windows when serving cached data
+  ([`b13aa45`](https://github.com/omadson/claude-kiosk/commit/b13aa45ff5634e69cfb8beb7d7658915967b2f61))
+
+
 ## v0.2.0 (2026-09-27)
 
 ### Continuous Integration

@@ -1,6 +1,6 @@
 [project]
 name = "claude-kiosk"
-version = "0.2.0"
+version = "0.2.1"
 description = "Local kiosk display for Claude usage and system resource stats."
 authors = [{ name = "Madson Dias", email = "madsonddias@gmail.com" }]
 requires-python = ">=3.9,<4"
