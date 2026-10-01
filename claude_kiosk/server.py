@@ -5,6 +5,7 @@ import os
 import shutil
 import time
 import urllib.request
+from datetime import datetime
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 
@@ -70,6 +71,23 @@ def _save_config():
     CONFIG_PATH.write_text(json.dumps(_config))
 
 
+def _reset_expired(data):
+    """Zero any window whose reset time already passed, so cached data from
+    before a usage window rolled over isn't served as current."""
+    now = time.time()
+    for key in ("session", "week"):
+        resets_at = data.get(key, {}).get("resets_at")
+        if not resets_at:
+            continue
+        try:
+            expired = datetime.fromisoformat(resets_at).timestamp() <= now
+        except ValueError:
+            continue
+        if expired:
+            data[key] = {"pct": 0, "resets_at": None}
+    return data
+
+
 def fetch_usage():
     """Fetch 5h/7d Claude usage, using OAuth creds and a short-lived cache."""
     now = time.time()
@@ -77,7 +95,7 @@ def fetch_usage():
         _cache["data"]
         and now - _cache["fetched_at"] < _config["min_fetch_interval"]
     ):
-        return _cache["data"]
+        return _reset_expired(_cache["data"])
 
     try:
         with open(CREDS_PATH) as f:
@@ -111,9 +129,7 @@ def fetch_usage():
         return data
     except Exception:
         if _cache["data"]:
-            return _cache[
-                "data"
-            ]  # serve stale data instead of breaking the page (e.g. on 429)
+            return _reset_expired(_cache["data"])
         raise
 
 
