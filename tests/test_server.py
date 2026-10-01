@@ -1,5 +1,6 @@
 import json
 import threading
+import time
 import urllib.error
 import urllib.request
 
@@ -121,3 +122,48 @@ def test_geocode_city_returns_none_on_failure(monkeypatch):
 
     monkeypatch.setattr(server.urllib.request, "urlopen", boom)
     assert server.geocode_city(1.0, 2.0) is None
+
+
+def _stale_cache(resets_at, fetched_at=0.0):
+    return {
+        "data": {
+            "session": {"pct": 42.0, "resets_at": resets_at},
+            "week": {"pct": 42.0, "resets_at": resets_at},
+        },
+        "fetched_at": fetched_at,
+    }
+
+
+def test_fetch_usage_zeroes_expired_window_on_stale_fallback(
+    monkeypatch, tmp_path
+):
+    past = "2000-01-01T00:00:00+00:00"
+    monkeypatch.setattr(server, "_cache", _stale_cache(past))
+    monkeypatch.setattr(server, "CREDS_PATH", tmp_path / "no-creds.json")
+    monkeypatch.setattr(
+        server, "_config", {**server.DEFAULT_CONFIG, "min_fetch_interval": 0}
+    )
+
+    data = server.fetch_usage()
+
+    assert data["session"] == {"pct": 0, "resets_at": None}
+    assert data["week"] == {"pct": 0, "resets_at": None}
+
+
+def test_fetch_usage_keeps_cache_hit_before_min_interval_but_zeroes_expired(
+    monkeypatch,
+):
+    past = "2000-01-01T00:00:00+00:00"
+    monkeypatch.setattr(
+        server, "_cache", _stale_cache(past, fetched_at=time.time())
+    )
+    monkeypatch.setattr(
+        server,
+        "_config",
+        {**server.DEFAULT_CONFIG, "min_fetch_interval": 999999},
+    )
+
+    data = server.fetch_usage()
+
+    assert data["session"]["pct"] == 0
+    assert data["week"]["pct"] == 0
