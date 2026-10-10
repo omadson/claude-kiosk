@@ -125,6 +125,7 @@ scheduleRefresh();
 const POMO = { focus: 25 * 60, short: 5 * 60, long: 15 * 60, every: 4 };
 const POMO_LABEL = { focus: "Focus", short: "Break", long: "Long break" };
 const pomo = { phase: "focus", done: 0, left: POMO.focus, endAt: null };
+try { Object.assign(pomo, JSON.parse(localStorage.getItem("pomo"))); } catch (e) {}
 
 function pomoLeft() {
   return pomo.endAt ? Math.max(0, Math.ceil((pomo.endAt - Date.now()) / 1000)) : pomo.left;
@@ -138,6 +139,22 @@ function pomoRender() {
   document.querySelectorAll("#pomo-dots i").forEach((d, i) => d.classList.toggle("on", i < n));
   document.getElementById("pomo-toggle").classList.toggle("running", !!pomo.endAt);
   document.getElementById("pomo-toggle-text").textContent = pomo.endAt ? "Pause" : "Start";
+  try { localStorage.setItem("pomo", JSON.stringify(pomo)); } catch (e) {}
+}
+function pomoAlert() {
+  document.body.classList.remove("pomo-flash");
+  void document.body.offsetWidth;
+  document.body.classList.add("pomo-flash");
+  try {
+    const ctx = new AudioContext();
+    [0, .3, .6].forEach(t => {
+      const o = ctx.createOscillator();
+      o.frequency.value = 880;
+      o.connect(ctx.destination);
+      o.start(ctx.currentTime + t);
+      o.stop(ctx.currentTime + t + .15);
+    });
+  } catch (e) {}
 }
 function pomoToggle() {
   if (pomo.endAt) { pomo.left = pomoLeft(); pomo.endAt = null; }
@@ -169,6 +186,7 @@ function pomoMenu() {
   m.hidden = !m.hidden;
 }
 setInterval(() => {
-  if (pomo.endAt && pomoLeft() === 0) pomoNext();
+  if (pomo.endAt && pomoLeft() === 0) { pomoAlert(); pomoNext(); }
   else if (pomo.endAt) pomoRender();
 }, 500);
+pomoRender();

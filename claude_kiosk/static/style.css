@@ -69,3 +69,5 @@ body {
 .pomo-dots i { width: calc(var(--t) * .2); height: calc(var(--t) * .2); border-radius: 50%; background: #333; transition: background-color .5s; }
 .pomo-dots i.on { background: #dd2e44; }
 .pomo-btn[aria-label] { justify-content: center; }
+@keyframes pomo-flash { 50% { background: #dd2e44; } }
+body.pomo-flash { animation: pomo-flash .8s 3; }
