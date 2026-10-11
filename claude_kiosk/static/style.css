@@ -18,9 +18,10 @@ body {
 
 .top { width: 92%; display: flex; justify-content: space-between; align-items: center; }
 .top-icon { width: 32vmin; height: 32vmin; flex-shrink: 0; }
-.avatar, .icon-overview { display: none; }
+.avatar, .icon-overview, .icon-pomodoro { display: none; }
 .top[data-screen="screen-usage"] .avatar { display: block; }
 .top[data-screen="screen-overview"] .icon-overview { display: block; }
+.top[data-screen="screen-pomodoro"] .icon-pomodoro { display: block; }
 
 .meter-row { width: 92%; display: flex; gap: 4vmin; }
 .meter-row .meter { width: auto; flex: 1; }
@@ -45,3 +46,28 @@ body {
 .fill { height: 100%; border-radius: 1.5vmin; transition: width .5s, background-color .5s; background: #4ade80; }
 .reset { display: flex; justify-content: space-between; font-size: 5vmin; line-height: 5vmin; height: 5vmin; color: #999; margin-top: 2.5vmin; }
 .err { color: #f87171; font-size: 2.5vmin; position: fixed; bottom: 1vmin; }
+.pomo { --t: min(26vmin, calc((92vw - 8vmin) / 4.25)); width: 92%; display: flex; flex-direction: column; gap: 4vmin; }
+.pomo-row { display: flex; align-items: center; gap: 4vmin; }
+.pomo-time { flex: 1; font-size: var(--t); letter-spacing: -.03em; font-weight: 700; color: #fff; line-height: 1; text-align: center; font-family: 'JetBrains Mono', monospace; }
+.pomo-ctls-row { display: flex; gap: calc(var(--t) * .1); }
+.pomo-ctls { display: flex; flex-direction: column; align-items: center; gap: calc(var(--t) * .1); }
+.pomo-btn { width: calc(var(--t) * .55); height: calc(var(--t) * .55); border: 0; border-radius: calc(var(--t) * .125); background: #262626; color: #999; display: flex; flex-direction: row-reverse; justify-content: space-between; align-items: center; gap: calc(var(--t) * .1); font: inherit; font-size: calc(var(--t) * .18); line-height: 1; padding: 0 calc(var(--t) * .15); cursor: pointer; }
+.pomo-btn:hover { background: #333; }
+.pomo-btn:active { background: #3a3a3a; }
+.pomo-btn svg { width: calc(var(--t) * .225); height: calc(var(--t) * .225); fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+#pomo-toggle { width: calc(var(--t) * 1.2); color: #fff; }
+#pomo-toggle .i-pause, #pomo-toggle.running .i-play { display: none; }
+#pomo-toggle.running .i-pause { display: block; }
+.pomo-opts { position: relative; }
+.pomo-menu { position: absolute; right: 100%; bottom: 0; margin-right: calc(var(--t) * .175); display: flex; flex-direction: column; background: #262626; border: 1px solid #3a3a3a; border-radius: 2.5vmin; padding: 1vmin; z-index: 1; }
+.pomo-menu::after { content: ""; position: absolute; right: -1.3vmin; bottom: calc(var(--t) * .215); width: 2.4vmin; height: 2.4vmin; background: #262626; border-top: 1px solid #3a3a3a; border-right: 1px solid #3a3a3a; transform: rotate(45deg); }
+.pomo-menu[hidden] { display: none; }
+.pomo-menu button { border: 0; border-radius: 1.5vmin; background: none; color: #fff; font: inherit; font-size: 4.5vmin; padding: 2.5vmin 3vmin; white-space: nowrap; text-align: left; cursor: pointer; }
+.pomo-menu button:hover, .pomo-menu button:active { background: #3a3a3a; }
+.pomo-menu button + button { border-top: 1px solid #3a3a3a; border-radius: 0 0 1.5vmin 1.5vmin; }
+.pomo-dots { display: flex; flex-direction: column; gap: calc(var(--t) * .1); }
+.pomo-dots i { width: calc(var(--t) * .2); height: calc(var(--t) * .2); border-radius: 50%; background: #333; transition: background-color .5s; }
+.pomo-dots i.on { background: #dd2e44; }
+.pomo-btn[aria-label] { justify-content: center; }
+@keyframes pomo-flash { 50% { background: #dd2e44; } }
+body.pomo-flash { animation: pomo-flash .8s 3; }

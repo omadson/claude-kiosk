@@ -24,6 +24,11 @@
         </g>
       </g>
     </svg>
+    <!-- Twemoji tomato (1f345), CC-BY 4.0, https://github.com/jdecked/twemoji -->
+    <svg class="top-icon icon-pomodoro" viewBox="0 0 36 36">
+      <path fill="#DD2E44" d="M22.494 5.344c-.687 0-1.352.066-1.991.177-.819-.104-2.74-.231-3.591-.231-8.473 0-15.886 3.177-15.886 14.298 0 9.036 7.049 16.361 16.976 16.361s17.974-7.325 17.974-16.361C35.975 8.339 26.59 5.344 22.494 5.344z"/>
+      <path fill="#77B255" d="M8.439.091c1.637 1.636 2.77 2.266 3.274 4.91.298 1.564 2.266 1.51 2.266 1.51s-3.903 1.763-5.54 3.4c0 0 4.91-1.637 6.547-1.637 0 0 3.273 1.637 3.273 3.273 0 0 0-3.273-1.636-3.273 0 0 4.909 0 4.909 3.273 0 0 0-4.91-1.637-4.91 0 0 4.911-1.636 6.548 0 0 0-1.686-1.72-4.911-1.636 0 0 1.638-1.637 4.911-1.637 0 0-5.288-1.511-6.925 1.763 0 0-1.385-1.385 1.385-4.155 0 0-4.28.755-4.28 4.029 0 0-1.552-.04-2.644-1.259C11.838 1.35 8.439.091 8.439.091z"/>
+    </svg>
     <div class="weather" id="weather">
       <div class="weather-row">
         <div class="weather-row-group">
@@ -124,6 +129,37 @@
         </div>
         <div class="bar"><div class="fill" id="ov-disk-fill"></div></div>
         <div class="reset"><span id="ov-disk-used-total"></span><span id="ov-disk-free"></span></div>
+      </div>
+    </div>
+    <div class="screen" id="screen-pomodoro">
+      <div class="pomo">
+        <div class="label" id="pomo-label">Focus</div>
+        <div class="pomo-row">
+          <div class="pomo-dots" id="pomo-dots"><i></i><i></i><i></i><i></i></div>
+          <div class="pomo-time" id="pomo-time">25:00</div>
+          <div class="pomo-ctls">
+            <!-- lucide play / pause / skip-forward / ellipsis-vertical icons (ISC, https://lucide.dev) -->
+            <button class="pomo-btn" id="pomo-toggle" onclick="pomoToggle()">
+              <svg class="i-play" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+              <svg class="i-pause" viewBox="0 0 24 24"><rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/></svg>
+              <span id="pomo-toggle-text">Start</span>
+            </button>
+            <div class="pomo-ctls-row">
+              <div class="pomo-opts">
+                <button class="pomo-btn" aria-label="Options" onclick="pomoMenu()">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                </button>
+                <div class="pomo-menu" id="pomo-menu" hidden>
+                  <button onclick="pomoResetSession()">Reset session</button>
+                  <button onclick="pomoResetTimer()">Reset current timer</button>
+                </div>
+              </div>
+              <button class="pomo-btn" aria-label="Skip" onclick="pomoNext()">
+                <svg viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" x2="19" y1="5" y2="19"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

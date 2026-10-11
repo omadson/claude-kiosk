@@ -94,7 +94,7 @@ function tickClock() {
     now.toLocaleDateString("en-GB", { weekday: "short" }).replace(".", "");
 }
 
-const screens = ["screen-usage", "screen-overview"];
+const screens = ["screen-usage", "screen-overview", "screen-pomodoro"];
 const FAST_SCREENS = new Set(["screen-overview"]);
 let screenIdx = 0;
 function goToScreen(dir) {
@@ -106,6 +106,8 @@ function goToScreen(dir) {
   scheduleRefresh();
 }
 function handleClick(e) {
+  if (e.target.closest(".pomo-ctls")) return;
+  document.getElementById("pomo-menu").hidden = true;
   goToScreen(e.clientX > window.innerWidth / 2 ? 1 : -1);
 }
 
@@ -119,3 +121,72 @@ function scheduleRefresh() {
   refreshTimer = setTimeout(scheduleRefresh, interval);
 }
 scheduleRefresh();
+
+const POMO = { focus: 25 * 60, short: 5 * 60, long: 15 * 60, every: 4 };
+const POMO_LABEL = { focus: "Focus", short: "Break", long: "Long break" };
+const pomo = { phase: "focus", done: 0, left: POMO.focus, endAt: null };
+try { Object.assign(pomo, JSON.parse(localStorage.getItem("pomo"))); } catch (e) {}
+
+function pomoLeft() {
+  return pomo.endAt ? Math.max(0, Math.ceil((pomo.endAt - Date.now()) / 1000)) : pomo.left;
+}
+function pomoRender() {
+  const s = pomoLeft();
+  const pad = n => String(n).padStart(2, "0");
+  document.getElementById("pomo-time").textContent = `${pad(Math.floor(s / 60))}:${pad(s % 60)}`;
+  document.getElementById("pomo-label").textContent = POMO_LABEL[pomo.phase];
+  const n = pomo.phase === "long" ? POMO.every : pomo.done % POMO.every;
+  document.querySelectorAll("#pomo-dots i").forEach((d, i) => d.classList.toggle("on", i < n));
+  document.getElementById("pomo-toggle").classList.toggle("running", !!pomo.endAt);
+  document.getElementById("pomo-toggle-text").textContent = pomo.endAt ? "Pause" : "Start";
+  try { localStorage.setItem("pomo", JSON.stringify(pomo)); } catch (e) {}
+}
+function pomoAlert() {
+  document.body.classList.remove("pomo-flash");
+  void document.body.offsetWidth;
+  document.body.classList.add("pomo-flash");
+  try {
+    const ctx = new AudioContext();
+    [0, .3, .6].forEach(t => {
+      const o = ctx.createOscillator();
+      o.frequency.value = 880;
+      o.connect(ctx.destination);
+      o.start(ctx.currentTime + t);
+      o.stop(ctx.currentTime + t + .15);
+    });
+  } catch (e) {}
+}
+function pomoToggle() {
+  if (pomo.endAt) { pomo.left = pomoLeft(); pomo.endAt = null; }
+  else pomo.endAt = Date.now() + pomo.left * 1000;
+  pomoRender();
+}
+function pomoNext(finished) {
+  if (pomo.phase === "focus") {
+    if (finished) pomo.done++;
+    pomo.phase = finished && pomo.done % POMO.every === 0 ? "long" : "short";
+  } else {
+    pomo.phase = "focus";
+  }
+  pomoResetTimer();
+}
+function pomoResetTimer() {
+  pomo.left = POMO[pomo.phase];
+  pomo.endAt = null;
+  document.getElementById("pomo-menu").hidden = true;
+  pomoRender();
+}
+function pomoResetSession() {
+  pomo.phase = "focus";
+  pomo.done = 0;
+  pomoResetTimer();
+}
+function pomoMenu() {
+  const m = document.getElementById("pomo-menu");
+  m.hidden = !m.hidden;
+}
+setInterval(() => {
+  if (pomo.endAt && pomoLeft() === 0) { pomoAlert(); pomoNext(true); }
+  else if (pomo.endAt) pomoRender();
+}, 500);
+pomoRender();
