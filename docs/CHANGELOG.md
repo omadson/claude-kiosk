@@ -1,6 +1,35 @@
 # CHANGELOG
 
 
+## v0.3.0 (2026-10-11)
+
+### Bug Fixes
+
+- Don't count skipped focus sessions as completed
+  ([`e463be1`](https://github.com/omadson/claude-kiosk/commit/e463be1395cb8ef2b90ab13767f8ee864eb2e62d))
+
+### Build System
+
+- Refresh uv.lock on release
+  ([`1cdbf6c`](https://github.com/omadson/claude-kiosk/commit/1cdbf6cca4e0c2f5519893c8392568e12061c330))
+
+- Sync uv.lock with package version 0.2.1
+  ([`346fc2e`](https://github.com/omadson/claude-kiosk/commit/346fc2e0835a8463d7e7969e5088c593d040a680))
+
+### Documentation
+
+- Mention pomodoro screen
+  ([`7330f40`](https://github.com/omadson/claude-kiosk/commit/7330f40c9464c3bc28d12dedf1fc5042734b88f9))
+
+### Features
+
+- Add pomodoro screen
+  ([`029df89`](https://github.com/omadson/claude-kiosk/commit/029df89d2e9d2a271f6931a2836d0bdbc76d981d))
+
+- Persist pomodoro state and alert on phase end
+  ([`5ca0672`](https://github.com/omadson/claude-kiosk/commit/5ca06729431607f55384049f226c1cdc6b6bcba3))
+
+
 ## v0.2.1 (2026-10-01)
 
 ### Bug Fixes
