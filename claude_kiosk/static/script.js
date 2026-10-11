@@ -161,10 +161,10 @@ function pomoToggle() {
   else pomo.endAt = Date.now() + pomo.left * 1000;
   pomoRender();
 }
-function pomoNext() {
+function pomoNext(finished) {
   if (pomo.phase === "focus") {
-    pomo.done++;
-    pomo.phase = pomo.done % POMO.every === 0 ? "long" : "short";
+    if (finished) pomo.done++;
+    pomo.phase = finished && pomo.done % POMO.every === 0 ? "long" : "short";
   } else {
     pomo.phase = "focus";
   }
@@ -186,7 +186,7 @@ function pomoMenu() {
   m.hidden = !m.hidden;
 }
 setInterval(() => {
-  if (pomo.endAt && pomoLeft() === 0) { pomoAlert(); pomoNext(); }
+  if (pomo.endAt && pomoLeft() === 0) { pomoAlert(); pomoNext(true); }
   else if (pomo.endAt) pomoRender();
 }, 500);
 pomoRender();
