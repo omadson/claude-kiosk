@@ -31,22 +31,57 @@ function fillColor(pct, hue) {
   return `hsl(${hue}, ${sat}%, ${light}%)`;
 }
 
+function renderUsage(prefix, usage, hue) {
+  document.getElementById(`${prefix}err`).textContent = usage.error || "";
+  if (usage.error) return;
+  for (const [key, val] of [["session", usage.session], ["week", usage.week]]) {
+    const pct = Math.round(val.pct);
+    document.getElementById(`${prefix}${key}-pct`).textContent = pct + "%";
+    const fill = document.getElementById(`${prefix}${key}-fill`);
+    fill.style.width = pct + "%";
+    fill.style.backgroundColor = fillColor(pct, hue ?? SCREEN_HUE[key]);
+    const reset = fmtReset(val.resets_at, key === "week");
+    document.getElementById(`${prefix}${key}-reset-left`).textContent = reset.left;
+    document.getElementById(`${prefix}${key}-reset-right`).textContent = reset.right;
+  }
+}
+
+// one extra usage screen per configured account, cloned from the main one
+const ACCT_HUES = [145, 280, 50, 210]; // icon + bar hue per extra account
+let acctKey = "";
+function syncAccounts(accts) {
+  const key = JSON.stringify(accts.map(a => a.name));
+  if (key === acctKey) return;
+  acctKey = key;
+  const old = document.querySelectorAll(".screen-acct");
+  old.forEach(n => n.remove());
+  const base = document.getElementById("screen-usage");
+  const ids = accts.map((a, i) => {
+    const el = base.cloneNode(true);
+    el.classList.remove("active");
+    el.classList.add("screen-acct");
+    el.querySelectorAll("[id]").forEach(n => { n.id = `a${i}-${n.id}`; });
+    el.id = `screen-a${i}`;
+    el.dataset.icon = "screen-usage";
+    el.dataset.name = a.name;
+    el.dataset.hue = ACCT_HUES[i % ACCT_HUES.length];
+    base.parentNode.insertBefore(el, document.getElementById("screen-overview"));
+    return el.id;
+  });
+  screens.splice(1, old.length, ...ids);
+  screenIdx = Math.min(screenIdx, screens.length - 1);
+  showScreen();
+}
+
 async function refresh() {
   try {
     const r = await fetch("/api/usage");
     const data = await r.json();
-    if (data.error) { document.getElementById("err").textContent = data.error; return; }
-    document.getElementById("err").textContent = "";
-    for (const [key, val] of [["session", data.session], ["week", data.week]]) {
-      const pct = Math.round(val.pct);
-      document.getElementById(`${key}-pct`).textContent = pct + "%";
-      const fill = document.getElementById(`${key}-fill`);
-      fill.style.width = pct + "%";
-      fill.style.backgroundColor = fillColor(pct, SCREEN_HUE[key]);
-      const reset = fmtReset(val.resets_at, key === "week");
-      document.getElementById(`${key}-reset-left`).textContent = reset.left;
-      document.getElementById(`${key}-reset-right`).textContent = reset.right;
-    }
+    const accts = data.accounts || [];
+    syncAccounts(accts);
+    accts.forEach((a, i) => renderUsage(`a${i}-`, a, ACCT_HUES[i % ACCT_HUES.length]));
+    renderUsage("", data);
+    if (data.error) return;
     if (data.weather && data.weather.temp != null) {
       document.getElementById("temp").textContent = Math.round(data.weather.temp) + "°";
       document.getElementById("humidity").textContent = Math.round(data.weather.humidity) + "%";
@@ -97,11 +132,18 @@ function tickClock() {
 const screens = ["screen-usage", "screen-overview", "screen-pomodoro"];
 const FAST_SCREENS = new Set(["screen-overview"]);
 let screenIdx = 0;
-function goToScreen(dir) {
-  screenIdx = (screenIdx + dir + screens.length) % screens.length;
+function showScreen() {
   const current = screens[screenIdx];
   screens.forEach(id => document.getElementById(id).classList.toggle("active", id === current));
-  document.getElementById("top").dataset.screen = current;
+  const el = document.getElementById(current);
+  document.getElementById("top").dataset.screen = el.dataset.icon || current;
+  const hue = el.dataset.hue;
+  document.getElementById("top").style.setProperty("--avatar", hue ? `hsl(${hue}, 63%, 60%)` : "");
+  document.getElementById("acct-name").textContent = el.dataset.name || "";
+}
+function goToScreen(dir) {
+  screenIdx = (screenIdx + dir + screens.length) % screens.length;
+  showScreen();
   clearTimeout(refreshTimer);
   scheduleRefresh();
 }
