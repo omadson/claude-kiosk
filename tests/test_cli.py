@@ -118,3 +118,40 @@ def test_uninstall_command_invokes_installer(monkeypatch):
     result = runner.invoke(app, ["uninstall"])
     assert result.exit_code == 0
     assert called == [True]
+
+
+def _isolated_config(monkeypatch, tmp_path):
+    monkeypatch.setattr(server, "CONFIG_DIR", tmp_path)
+    monkeypatch.setattr(server, "CONFIG_PATH", tmp_path / "config.json")
+    monkeypatch.setattr(server, "_config", dict(server.DEFAULT_CONFIG))
+
+
+def test_config_command_adds_and_removes_account(monkeypatch, tmp_path):
+    _isolated_config(monkeypatch, tmp_path)
+    acct = tmp_path / "acct"
+    acct.mkdir()
+    (acct / ".credentials.json").write_text("{}")
+
+    result = runner.invoke(app, ["config", "--add-account", f"work={acct}"])
+
+    assert result.exit_code == 0
+    saved = json.loads((tmp_path / "config.json").read_text())
+    assert saved["accounts"] == [{"name": "work", "config_dir": str(acct)}]
+
+    result = runner.invoke(app, ["config", "--remove-account", "work"])
+
+    assert result.exit_code == 0
+    assert json.loads((tmp_path / "config.json").read_text())["accounts"] == []
+
+
+def test_config_command_rejects_account_without_credentials(
+    monkeypatch, tmp_path
+):
+    _isolated_config(monkeypatch, tmp_path)
+
+    result = runner.invoke(
+        app, ["config", "--add-account", f"work={tmp_path}"]
+    )
+
+    assert result.exit_code == 1
+    assert not (tmp_path / "config.json").exists()

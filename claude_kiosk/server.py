@@ -8,6 +8,7 @@ import urllib.request
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
+from typing import Any
 
 PKG_DIR = Path(__file__).resolve().parent
 STATIC_DIR = PKG_DIR / "static"
@@ -27,17 +28,20 @@ CREDS_PATH = Path("~/.claude/.credentials.json").expanduser()
 USAGE_URL = "https://api.anthropic.com/api/oauth/usage"
 
 # Passaré, Fortaleza-CE; overridable via `claude-kiosk config`
-DEFAULT_CONFIG: dict[str, float | int | str] = {
+DEFAULT_CONFIG: dict[str, Any] = {
     "weather_lat": -3.8131,
     "weather_lon": -38.5321,
     "weather_city": "Fortaleza",
     "port": 8420,
     "min_fetch_interval": 300,  # seconds; avoid tripping the usage API's 429s
     "weather_min_interval": 900,  # seconds; weather doesn't need to be fresher
+    "accounts": [],  # extra Claude accounts: [{"name", "config_dir"}]
 }
 _config = dict(DEFAULT_CONFIG)
 
 _cache = {"data": None, "fetched_at": 0.0}
+_account_caches: dict[str, dict] = {}  # extra accounts, keyed by config_dir
+_failures: dict[str, tuple[float, str]] = {}  # creds path -> (when, error)
 
 
 def _load_cache():
@@ -88,17 +92,36 @@ def _reset_expired(data):
     return data
 
 
-def fetch_usage():
-    """Fetch 5h/7d Claude usage, using OAuth creds and a short-lived cache."""
+def fetch_usage(config_dir=None):
+    """Fetch 5h/7d Claude usage, using OAuth creds and a short-lived cache.
+
+    `config_dir` is a `CLAUDE_CONFIG_DIR` of an extra account; None means
+    the default account (`~/.claude`).
+    """
+    if config_dir is None:
+        creds_path, cache = CREDS_PATH, _cache
+    else:
+        creds_path = Path(config_dir).expanduser() / ".credentials.json"
+        cache = _account_caches.setdefault(
+            str(config_dir), {"data": None, "fetched_at": 0.0}
+        )
     now = time.time()
     if (
-        _cache["data"]
-        and now - _cache["fetched_at"] < _config["min_fetch_interval"]
+        cache["data"]
+        and now - cache["fetched_at"] < _config["min_fetch_interval"]
     ):
-        return _reset_expired(_cache["data"])
+        return _reset_expired(cache["data"])
+
+    # after a failure (e.g. 429) wait min_fetch_interval before retrying;
+    # the overview screen polls every 3s and would otherwise hammer the API
+    failed_at, error = _failures.get(str(creds_path), (0.0, ""))
+    if now - failed_at < _config["min_fetch_interval"]:
+        if cache["data"]:
+            return _reset_expired(cache["data"])
+        raise RuntimeError(error)
 
     try:
-        with open(CREDS_PATH) as f:
+        with open(creds_path) as f:
             creds = json.load(f)
         token = creds["claudeAiOauth"]["accessToken"]
         req = urllib.request.Request(
@@ -123,13 +146,16 @@ def fetch_usage():
                 "resets_at": seven.get("resets_at"),
             },
         }
-        _cache["data"] = data
-        _cache["fetched_at"] = now
-        _save_cache()
+        cache["data"] = data
+        cache["fetched_at"] = now
+        if config_dir is None:
+            _save_cache()
+        _failures.pop(str(creds_path), None)
         return data
-    except Exception:
-        if _cache["data"]:
-            return _reset_expired(_cache["data"])
+    except Exception as e:
+        _failures[str(creds_path)] = (now, str(e))
+        if cache["data"]:
+            return _reset_expired(cache["data"])
         raise
 
 
@@ -252,6 +278,18 @@ def fetch_cpu():
     return {"pct": pct, "cores": os.cpu_count()}
 
 
+def fetch_accounts():
+    """Usage for each extra account; a failing one reports its own error."""
+    out = []
+    for acct in _config["accounts"]:
+        try:
+            usage = fetch_usage(acct["config_dir"])
+        except Exception as e:
+            usage = {"error": str(e)}
+        out.append({"name": acct["name"], **usage})
+    return out
+
+
 class Handler(BaseHTTPRequestHandler):
     """Serves the static dashboard plus /api/usage."""
 
@@ -288,6 +326,7 @@ class Handler(BaseHTTPRequestHandler):
                 data = fetch_usage()
             except Exception as e:
                 data = {"error": str(e)}
+            data["accounts"] = fetch_accounts()
             data["weather"] = fetch_weather()
             data["city"] = _config.get("weather_city")
             data["disk"] = fetch_disk()

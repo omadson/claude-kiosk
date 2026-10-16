@@ -1,5 +1,6 @@
 """Command-line entry point for claude-kiosk."""
 
+from pathlib import Path
 from typing import Optional
 
 import typer
@@ -68,6 +69,16 @@ def config(
         "--weather-min-interval",
         help="Seconds between weather API calls.",
     ),
+    add_account: Optional[str] = typer.Option(
+        None,
+        "--add-account",
+        metavar="NAME=DIR",
+        help="Add a screen for another Claude account (its "
+        "CLAUDE_CONFIG_DIR, e.g. work=~/.claude-work).",
+    ),
+    remove_account: Optional[str] = typer.Option(
+        None, "--remove-account", metavar="NAME", help="Remove an account."
+    ),
 ):
     """Show or update persisted config (weather location, port, ...)."""
     from claude_kiosk import server
@@ -100,9 +111,38 @@ def config(
     if weather_min_interval is not None:
         server._config["weather_min_interval"] = weather_min_interval
 
+    if add_account is not None:
+        name, _, config_dir = add_account.partition("=")
+        creds = Path(config_dir).expanduser() / ".credentials.json"
+        if not (name and config_dir and creds.is_file()):
+            typer.echo(
+                "Error: --add-account needs NAME=DIR, where DIR holds "
+                ".credentials.json (log in with CLAUDE_CONFIG_DIR=DIR).",
+                err=True,
+            )
+            raise typer.Exit(1)
+        server._config["accounts"] = [
+            *(a for a in server._config["accounts"] if a["name"] != name),
+            {"name": name, "config_dir": config_dir},
+        ]
+    if remove_account is not None:
+        server._config["accounts"] = [
+            a
+            for a in server._config["accounts"]
+            if a["name"] != remove_account
+        ]
+
     if any(
         v is not None
-        for v in (lat, lon, port, min_fetch_interval, weather_min_interval)
+        for v in (
+            lat,
+            lon,
+            port,
+            min_fetch_interval,
+            weather_min_interval,
+            add_account,
+            remove_account,
+        )
     ):
         server._save_config()
 

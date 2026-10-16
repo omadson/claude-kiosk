@@ -11,9 +11,10 @@
   <a href="https://github.com/omadson/claude-kiosk/blob/main/LICENSE"><img src="https://img.shields.io/github/license/omadson/claude-kiosk" alt="License"></a>
 </p>
 
-`claude-kiosk` is a local kiosk display for Claude usage and system resource stats. Shows three screens you tap/click to switch between:
+`claude-kiosk` is a local kiosk display for Claude usage and system resource stats. Shows these screens you tap/click to switch between:
 
 - **Usage**: 5-hour and 7-day Claude usage bars (from the OAuth `usage` endpoint), plus a weather strip (day, time, temperature, humidity) up top.
+- **Extra accounts** (optional): one more usage screen per additional Claude account, added with `claude-kiosk config --add-account NAME=DIR` where `DIR` is that account's `CLAUDE_CONFIG_DIR` (e.g. `work=~/.claude-work`). Remove with `--remove-account NAME`.
 - **Overview**: memory, CPU and disk usage bars for the host machine.
 - **Pomodoro**: focus/break timer (25/5 min, 15 min long break every 4 sessions) with start/pause, skip and reset controls. State persists across reloads and the screen flashes and beeps when a phase ends.
 
