@@ -1,6 +1,30 @@
 # CHANGELOG
 
 
+## v0.4.0 (2026-10-16)
+
+### Code Style
+
+- **ui**: Show account name in a box
+  ([`064a1be`](https://github.com/omadson/claude-kiosk/commit/064a1befded2a31f229be75d3f771837f8bd7273))
+
+### Documentation
+
+- Document extra Claude accounts
+  ([`3e3bfd4`](https://github.com/omadson/claude-kiosk/commit/3e3bfd4e18989fddf0b9273feeed5a568c39cfcb))
+
+### Features
+
+- **cli**: Add --add-account/--remove-account to config
+  ([`45c4f42`](https://github.com/omadson/claude-kiosk/commit/45c4f4220db661742d005854cca221906d04bd41))
+
+- **server**: Fetch usage for extra Claude accounts
+  ([`c7b461d`](https://github.com/omadson/claude-kiosk/commit/c7b461d271822e35a7d80353a83f8091012355e2))
+
+- **ui**: Add one usage screen per extra account
+  ([`ae54728`](https://github.com/omadson/claude-kiosk/commit/ae54728a322e09b6f1e7427dde334d2864ec19b5))
+
+
 ## v0.3.0 (2026-10-11)
 
 ### Bug Fixes
