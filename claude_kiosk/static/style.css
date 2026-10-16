@@ -26,7 +26,8 @@ body {
 
 .meter-row { width: 92%; display: flex; gap: 4vmin; }
 .meter-row .meter { width: auto; flex: 1; }
-.acct-name { flex: 1; min-width: 0; padding: 0 3vmin; text-align: center; font-size: 7vmin; color: #999; text-transform: uppercase; letter-spacing: .08em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.acct-name { min-width: 0; background: #262626; border-radius: 2vmin; padding: 2vmin 3vmin; font-size: 5vmin; font-weight: 700; color: #999; text-transform: lowercase; font-family: 'JetBrains Mono', monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.acct-name:empty { display: none; }
 .weather { text-align: right; background: #262626; border-radius: 2vmin; padding: 2.5vmin 3.5vmin; }
 .clock { font-size: 6.5vmin; font-weight: 700; color: #fff; line-height: 1; font-family: 'JetBrains Mono', monospace; }
 .weather-row { display: flex; align-items: center; justify-content: space-between; gap: 3vmin; }
